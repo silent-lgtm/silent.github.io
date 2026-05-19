@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SILENT DEVELOPMENT | Разработка Telegram ботов</title>
+    <style>
+        /* Полный сброс стилей и хакерский темный фон */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #060606;
+            color: #d1d1d1;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* Фоновая сетка-паутина (созвездия) в точности как на скриншоте */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Cpath d='M30 40 L110 90 L180 30 L250 110 L280 50 M10 180 L80 240 L140 190 L220 280 L270 200' stroke='rgba(255,255,255,0.035)' stroke-width='0.8' fill='none'/%3E%3Ccircle cx='30' cy='40' r='1.2' fill='rgba(255,255,255,0.1)'/%3E%3Ccircle cx='110' cy='90' r='1.2' fill='rgba(255,255,255,0.1)'/%3E%3Ccircle cx='180' cy='30' r='1.2' fill='rgba(255,255,255,0.1)'/%3E%3Ccircle cx='250' cy='110' r='1.2' fill='rgba(255,255,255,0.1)'/%3E%3Ccircle cx='80' cy='240' r='1.2' fill='rgba(255,255,255,0.1)'/%3E%3C/svg%3E");
+            background-size: cover;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 30px 15px;
+        }
+
+        /* Тонкие горизонтальные полоски по всему сайту */
+        .divider-line {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15) 15%, rgba(255, 255, 255, 0.15) 85%, transparent);
+            margin: 25px 0;
+        }
+
+        /* Шапка */
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .main-title {
+            font-size: 26pt;
+            font-weight: 800;
+            letter-spacing: 5px;
+            color: #ffffff;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-size: 11pt;
+            font-weight: 600;
+            color: #ffffff;
+            margin: 0 0 8px 0;
+            letter-spacing: 0.5px;
+        }
+
+        .slogan {
+            font-size: 8.5pt;
+            color: #777777;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        /* Контурные карточки блоков */
+        .block-card {
+            background-color: #0b0b0b;
+            border: 1px solid #1e1e1e;
+            border-radius: 6px;
+            padding: 24px;
+            margin-bottom: 18px;
+            position: relative;
+        }
+
+        .block-title {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        /* Маленькая полосочка под заголовками блоков */
+        .block-title::after {
+            content: '';
+            display: block;
+            width: 35px;
+            height: 1.5px;
+            background-color: #ffffff;
+            margin: 8px auto 0 auto;
+        }
+
+        .block-text {
+            font-size: 9.5pt;
+            color: #999999;
+            margin-bottom: 15px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        /* Иконки в углах карточек */
+        .icon-top-right {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            color: #3a3a3a;
+            font-size: 12pt;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Кнопки-овалы (теги) в блоке "Обо мне" */
+        .tags-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .oval-tag {
+            background-color: #111111;
+            border: 1px solid #222222;
+            color: #aaaaaa;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 8pt;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+
+        /* Терминал ввода */
+        .console-box {
+            background-color: #070707;
+            border: 1px solid #181818;
+            border-radius: 5px;
+            font-family: "Courier New", Courier, monospace;
+            padding: 14px;
+            margin: 20px 0;
+        }
+
+        .console-header {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .circle-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .c-red { background-color: #ff5f56; }
+        .c-yellow { background-color: #ffbd2e; }
+        .c-green { background-color: #27c93f; }
+
+        .console-body {
+            font-size: 9pt;
+            color: #888888;
+        }
+
+        .console-prompt {
+            color: #ffffff;
+        }
+
+        .blink-cursor {
+            display: inline-block;
+            width: 7px;
+            height: 14px;
+            background-color: #ffffff;
+            margin-left: 3px;
+            animation: flash 1s infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes flash {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        /* Адаптивная сетка 50/50 */
+        .row-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+
+        @media (max-width: 550px) {
+            .row-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Иконки технологий */
+        .tech-row {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 450px) {
+            .tech-row {
+                grid-template-columns: repeat(3, 1fr);
+                row-gap: 15px;
+            }
+        }
+
+        .tech-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tech-svg {
+            width: 22px;
+            height: 22px;
+            margin-bottom: 6px;
+            fill: #666666;
+        }
+
+        .tech-label {
+            font-size: 7.5pt;
+            color: #555555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Строгие прямоугольные кнопки */
+        .action-button {
+            display: block;
+            width: 100%;
+            background-color: transparent;
+            border: 1px solid #ffffff;
+            color: #ffffff;
+            padding: 10px;
+            border-radius: 3px;
+            font-size: 8.5pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+            margin-top: 12px;
+        }
+
+        .action-button:hover {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        /* Большая ссылка на личку в блоке Контакты */
+        .tg-contact-banner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 11pt;
+            margin: 20px 0;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .tg-contact-banner span {
+            color: #4ba3e3;
+            text-decoration: none;
+        }
+
+        /* Подвал */
+        footer {
+            text-align: center;
+            margin-top: 45px;
+            padding: 15px 0;
+            font-size: 8pt;
+            color: #444444;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-pattern"></div>
+
+    <div class="container">
+        
+        <!-- Главная Шапка сайта -->
+        <header>
+            <h1 class="main-title">Silent</h1>
+            <div class="subtitle">Разработка Telegram ботов | Программирование | IT решения</div>
+            <div class="slogan">Превращаем идеи в цифровую реальность</div>
+        </header>
+
+        <div class="divider-line"></div>
+
+        <!-- Раздел: Обо мне -->
+        <div class="block-card">
+            <div class="icon-top-right">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8l-1.32 6.95c-.15.68-.42 2.19-.73 3.84-.31 1.64-.54 2.87-.59 3.11z"/></svg>
+            </div>
+            <h2 class="block-title">Обо мне</h2>
+            <p class="block-text" style="text-align: justify;">
+                Silent — профессиональный разработчик с многолетним опытом создания сложных IT-решений. Моя специализация включает создание Telegram ботов, веб-приложений, мобильных приложений и кастомного программного обеспечения.
+            </p>
+            <p class="block-text" style="text-align: justify; margin-bottom: 0;">
+                Я создаю интеллектуальных Telegram ботов любой сложности - от простых автоматизированных помощников до сложных CRM-систем с интеграцией платежей и баз данных.
+            </p>
+            <div class="tags-wrapper">
+                <a href="https://t.me/xynbyte" target="_blank" class="oval-tag">🔹 Telegram боты</a>
+                <a href="https://t.me/xynbyte" target="_blank" class="oval-tag">&lt;/&gt; Веб-разработка</a>
+                <a href="https://t.me/xynbyte" target="_blank" class="oval-tag">📱 Мобильные приложения</a>
+            </div>
+        </div>
+
+        <!-- Терминал терминальной строки -->
+        <div class="console-box">
+            <div class="console-header">
+                <div class="circle-dot c-red"></div>
+                <div class="circle-dot c-yellow"></div>
+                <div class="circle-dot c-green"></div>
+            </div>
+            <div class="console-body">
+                <span class="console-prompt">user@silent:~$</span><span class="blink-cursor"></span>
+            </div>
+        </div>
+
+        <!-- Раздел: Гарантия качества -->
+        <div class="block-card">
+            <div class="icon-top-right">🛡️</div>
+            <h2 class="block-title">Гарантия качества</h2>
+            <p class="block-text" style="margin-bottom: 0;">
+                Чистый код, тестирование и оптимизация - основа моей работы. Гарантирую соответствие техническим требованиям и срокам реализации проектов.
+            </p>
+        </div>
+
+        <div class="divider-line"></div>
+        <div class="section-divider" style="text-align: center; font-size: 12pt; font-weight: bold; color: #ffffff; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px;">Мои услуги</div>
+
+        <!-- Двухколоночная сетка Услуг -->
+        <div class="row-grid">
+            <div class="block-card">
+                <div class="icon-top-right">💬</div>
+                <h3 class="block-title">Telegram Боты</h3>
+                <p class="block-text" style="font-size: 9pt; text-align: left;">
+                    Разработка интеллектуальных Telegram ботов любой сложности: автоматизация, интеграция с CRM, платежные системы, игры, парсинг данных и многое другое.
+                </p>
+            </div>
+            
+            <div class="block-card">
+                <div class="icon-top-right">💻</div>
+                <h3 class="block-title">Веб-разработка</h3>
+                <p class="block-text" style="font-size: 9pt; text-align: left;">
+                    Создание современных веб-приложений с использованием React, Angular или Vue. От лендингов до сложных корпоративных порталов с адаптивным дизайном.
+                </p>
+            </div>
+        </div>
+
+        <!-- Раздел: Разработка на заказ -->
+        <div class="block-card">
+            <div class="icon-top-right">⚙️</div>
+            <h3 class="block-title">Разработка на заказ</h3>
+            <p class="block-text">
+                Кастомные решения для вашего бизнеса: автоматизация процессов, интеграция систем, разработка уникального функционала под ваши требования.
+            </p>
+            <a href="https://t.me/xynbyte" target="_blank" class="action-button">Обсудить проект</a>
+        </div>
+
+        <div class="divider-line"></div>
+
+        <!-- Раздел: Технологии -->
+        <div class="block-card">
+            <h2 class="block-title">Технологии</h2>
+            <p class="block-text">
+                Я работаю с широким стеком современных технологий, чтобы обеспечить оптимальное решение для каждой задачи:
+            </p>
+            <div class="tech-row">
+                <div class="tech-box">
+                    <svg class="tech-svg" viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.47-.52-.17L7.71 13.3 3.64 12c-.88-.28-.89-.88.19-1.3l15.92-6.14c.74-.27 1.39.18 1.16 1.19l-2.7 12.75c-.2 1-.8 1.25-1.63.78l-4.12-3.04-1.99 1.92c-.22.22-.41.41-.83.41z"/></svg>
+                    <span class="tech-label">Telegram API</span>
+                </div>
+                <div class="tech-box">
+                    <svg class="tech-svg" viewBox="0 0 24 24"><path d="M3 3h18v18H3V3zm10.54 13.04c0 .84.31 1.45.92 1.83.62.38 1.54.49 2.5.49 1.12 0 1.95-.19 2.47-.46v-1.9c-.4.21-.92.38-1.56.38-.63 0-1.12-.13-1.38-.34-.26-.2-.39-.56-.39-1.07V8.5h2.52V6.62h-2.52V4h-2.06v2.62H12.3v1.88h1.24v7.54z"/></svg>
+                    <span class="tech-label">JavaScript</span>
+                </div>
+                <div class="tech-box">
+                    <svg class="tech-svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2zm-1.8 3h3.6a.6.6 0 0 1 .6.6v1.8H10.2V5.6a.6.6 0 0 1 .6-.6z"/></svg>
+                    <span class="tech-label">Python</span>
+                </div>
+                <div class="tech-box">
+                    <svg class="tech-svg" viewBox="0 0 24 24"><path d="M12 2L2 7.5v9L12 22l10-5.5v-9L12 2zm6 13.5l-6 3.3-6-3.3v-6.6l6-3.3 6 3.3v6.6z"/></svg>
+                    <span class="tech-label">Node.js</span>
+                </div>
+                <div class="tech-box">
+                    <svg class="tech-svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 4 2 6.5v11c0 2.5 4.48 4.5 10 4.5s10-2 10-4.5v-11C22 4 17.52 2 12 2z"/></svg>
+                    <span class="tech-label">Базы данных</span>
+                </div>
+                <div class="tech-box">
+                    <svg class="tech-svg" viewBox="0 0 24 24"><path d="M19.3 15.7c-.5-.4-1.2-.6-2-.6-1.5 0-2.5.9-2.5 2.2 0 1.2 1 2 2.4 2 1 0 1.8-.4 2.2-1v.8h1.8v-5.2h-1.9v1.8z"/></svg>
+                    <span class="tech-label">AWS</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider-line"></div>
+        <div class="section-divider" style="text-align: center; font-size: 12pt; font-weight: bold; color: #ffffff; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">Контакты</div>
+
+        <!-- Центральный юзернейм связи -->
+        <a href="https://t.me/xynbyte" target="_blank" class="tg-contact-banner">
+            💬 Моя личка: <span>@xynbyte</span>
+        </a>
+
+        <!-- Двухколоночная сетка Контактов -->
+        <div class="row-grid">
+            <div class="block-card">
+                <h3 class="block-title">Заказать проект</h3>
+                <p class="block-text" style="font-size: 9pt;">
+                    Обсудим ваш проект, требования и сроки реализации. Составим техническое задание и предложим оптимальное решение.
+                </p>
+                <a href="https://t.me/xynbyte" target="_blank" class="action-button">Отправить запрос</a>
+            </div>
+            
+            <div class="card" style="background-color: #0b0b0b; border: 1px solid #1e1e1e; border-radius: 6px; padding: 24px; position: relative;">
+                <h3 class="block-title">Консультация</h3>
+                <p class="block-text" style="font-size: 9pt;">
+                    Нужен совет по разработке или выбору технологий? Проведу техническую экспертизу вашего проекта.
+                </p>
+                <a href="https://t.me/xynbyte" target="_blank" class="action-button">Записаться</a>
+            </div>
+        </div>
+
+        <!-- Раздел: Партнерство -->
+        <div class="block-card">
+            <h3 class="block-title">Партнёрство</h3>
+            <p class="block-text">
+                Ищете разработчика в команду или для долгосрочного сотрудничества? Готов рассмотреть интересные предложения.
+            </p>
+            <a href="https://t.me/xynbyte" target="_blank" class="action-button">Предложить сотрудничество</a>
+        </div>
+
+        <div class="divider-line"></div>
+
+        <!-- Подвал -->
+        <footer>
+            © 2026 SILENT DEVELOPMENT. ALL RIGHTS RESERVED. CONTACT: @XYNBYTE
+        </footer>
+
+    </div>
+
+</body>
+</html>
